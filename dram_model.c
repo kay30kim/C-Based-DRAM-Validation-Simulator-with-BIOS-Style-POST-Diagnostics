@@ -49,6 +49,20 @@ int dram_is_initialized(const Dram *dram)
     return dram != NULL && dram->data != NULL && dram->size_bytes > 0;
 }
 
+int dram_write32(Dram *dram, uint32_t address, uint32_t value)
+{
+    if (!is_aligned32(address)) {
+        return -1;
+    }
+
+    if (!dram_is_valid_range(dram, address, sizeof(uint32_t))) {
+        return -1;
+    }
+
+    memcpy(&dram->data[address], &value, sizeof(value));
+    return 0;
+}
+
 int dram_read32(const Dram *dram, uint32_t address, uint32_t *out_value)
 {
     if (out_value == NULL) {
