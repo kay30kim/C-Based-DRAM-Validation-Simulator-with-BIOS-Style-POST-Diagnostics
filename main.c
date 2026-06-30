@@ -1,4 +1,5 @@
 #include "dram_model.h"
+#include "memory_test.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -71,6 +72,7 @@ int main(int argc, char **argv)
     Dram dram = {0};
     size_t dram_mb = 0;
     size_t dram_bytes = 0;
+    MemoryTestResult result;
 
     if (parse_dram_size_mb(argc, argv, &dram_mb) != 0)
     {
@@ -90,14 +92,23 @@ int main(int argc, char **argv)
     }
 
     printf("[DRAM] Virtual DRAM initialized: %zu bytes\n", dram_size_bytes(&dram));
-    printf("[INFO] Day 1 commit 1 scope: allocation/free model only\n");
-    printf("[INFO] Read/write APIs and memory tests will be added in later commits\n");
 
     if (run_basic_rw_smoke_test(&dram) != 0)
     {
         dram_free(&dram);
         return 1;
     }
+
+    if (memory_test_constant_pattern(&dram,
+                                     0x2000U,
+                                     64U * 1024U,
+                                     0xAAAAAAAAU,
+                                     &result) != 0) {
+        dram_free(&dram);
+        return 1;
+    }
+
+    printf("[RESULT] PASS\n");
     dram_free(&dram);
     printf("[DRAM] Virtual DRAM released\n");
 
