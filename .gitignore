@@ -1,0 +1,10 @@
+# Build outputs
+*.o
+dram_test
+
+# etc
+venv/
+.venv/
+env/
+.DS_Store
+.vscode/
